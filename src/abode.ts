@@ -2,6 +2,7 @@ import { getCurrentScript } from 'tiny-current-script';
 import { createElement, FC } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 
+
 interface RegisteredComponents {
   [key: string]: {
     module: Promise<any>;
@@ -29,8 +30,8 @@ interface PopulateOptions {
   callback?: () => void;
 }
 
-export type RegisterPromise = () => Promise<any>;
-export type RegisterComponent = () => FC<any>;
+export type RegisterPromise = () => Promise<JSX.Element>;
+export type RegisterComponent = () => FC<JSX.Element>;
 export type RegisterFN = RegisterPromise | RegisterComponent;
 export type ParseFN = (rawProp: string) => any;
 
@@ -49,10 +50,10 @@ export const unRegisterAllComponents = () => {
 export const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 const retry = async (
-  fn: () => any,
+  fn: () => unknown,
   times: number,
   delayTime: number
-): Promise<any> => {
+): Promise<unknown> => {
   try {
     return await fn();
   } catch (err) {
@@ -198,9 +199,9 @@ export const trackPropChanges = (el: Element, root: Root) => {
   }
 };
 
-function unmountOnNodeRemoval(element: any, root: Root) {
+function unmountOnNodeRemoval(element: HTMLElement|Node, root: Root) {
   const observer = new MutationObserver(function() {
-    function isDetached(el: any): any {
+    function isDetached(el: HTMLElement|Node): boolean {
       if (el.parentNode === document) {
         return false;
       } else if (el.parentNode === null) {
@@ -249,14 +250,14 @@ const checkForAndHandleNewComponents = async (options?: PopulateOptions) => {
 
 export const populate = async (options?: PopulateOptions) => {
   if (/complete|interactive|loaded/.test(document.readyState)) {
-    populateInner(options);
+    addNewComponentHandler(options);
   }
   else {
-    document.addEventListener('DOMContentLoaded', ()=> populateInner(options), false);
+    document.addEventListener('DOMContentLoaded', ()=> addNewComponentHandler(options), false);
   }
 };
 
-const populateInner = async (options?: PopulateOptions) => {
+const addNewComponentHandler = async (options?: PopulateOptions) => {
   await checkForAndHandleNewComponents(options);
 
   document.body.addEventListener('DOMNodeInserted', () =>
