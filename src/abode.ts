@@ -248,9 +248,17 @@ const checkForAndHandleNewComponents = async (options?: PopulateOptions) => {
 };
 
 export const populate = async (options?: PopulateOptions) => {
+  if (/complete|interactive|loaded/.test(document.readyState)) {
+    populateInner(options);
+  }
+  else {
+    document.addEventListener('DOMContentLoaded', ()=> populateInner(options), false);
+  }
+};
+
+const populateInner = async (options?: PopulateOptions) => {
   await checkForAndHandleNewComponents(options);
 
   document.body.addEventListener('DOMNodeInserted', () =>
-    checkForAndHandleNewComponents(options)
-  );
+    checkForAndHandleNewComponents(options))
 };
