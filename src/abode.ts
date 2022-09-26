@@ -191,8 +191,8 @@ export const renderAbode = async (el: Element, root: Root) => {
 
 export const trackPropChanges = (el: Element, root: Root) => {
   if (MutationObserver) {
-    const observer = new MutationObserver(() => {
-      renderAbode(el, root);
+    const observer = new MutationObserver(async () => {
+      await renderAbode(el, root);
     });
     observer.observe(el, { attributes: true });
   }
@@ -249,7 +249,7 @@ const checkForAndHandleNewComponents = async (options?: PopulateOptions) => {
 
 export const populate = async (options?: PopulateOptions) => {
   if (/complete|interactive|loaded/.test(document.readyState)) {
-    populateInner(options);
+    await populateInner(options);
   }
   else {
     document.addEventListener('DOMContentLoaded', ()=> populateInner(options), false);
