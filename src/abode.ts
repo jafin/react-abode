@@ -258,7 +258,6 @@ export const populate = async (options?: PopulateOptions) => {
 
 const populateInner = async (options?: PopulateOptions) => {
   await checkForAndHandleNewComponents(options);
-
-  document.body.addEventListener('DOMNodeInserted', () =>
-    checkForAndHandleNewComponents(options))
+  const observer = new MutationObserver(async() => await checkForAndHandleNewComponents(options));
+  observer.observe(document.body, {childList: true, subtree: true});
 };
