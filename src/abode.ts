@@ -258,6 +258,7 @@ export const populate = async (options?: PopulateOptions) => {
 
 const populateInner = async (options?: PopulateOptions) => {
   await checkForAndHandleNewComponents(options);
-  const observer = new MutationObserver(async() => await checkForAndHandleNewComponents(options));
+  const callback = await checkForAndHandleNewComponents(options);
+  const observer = new MutationObserver(async() => callback);
   observer.observe(document.body, {childList: true, subtree: true});
 };
